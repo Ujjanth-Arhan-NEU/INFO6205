@@ -11,6 +11,11 @@ import edu.neu.coe.info6205.util.Config;
 import edu.neu.coe.info6205.util.Utilities;
 import java.util.*;
 
+/**
+ * Class InsertionSort.
+ *
+ * @param <X> the underlying comparable type.
+ */
 public class InsertionSort<X extends Comparable<X>> extends SortWithHelper<X> {
 
     /**
