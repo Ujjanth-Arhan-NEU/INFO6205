@@ -101,17 +101,11 @@ public class InsertionSort<X extends Comparable<X>> extends SortWithHelper<X> {
         });
 
         while (i <= 6) {
-            final int n1 = n;
-            System.out.println(benchmark_timer.runFromSupplier(() -> insertionSort.getArray(SortOrder.Random, n1), 100) + " n value " + n);
-
-            final int n2 = n;
-            System.out.println(benchmark_timer.runFromSupplier(() -> insertionSort.getArray(SortOrder.Ordered, n2), 100) + " n value " + n);
-
-            final int n3 = n;
-            System.out.println(benchmark_timer.runFromSupplier(() -> insertionSort.getArray(SortOrder.PartiallyOrdered, n3), 100) + " n value " + n);
-
-            final int n4 = n;
-            System.out.println(benchmark_timer.runFromSupplier(() -> insertionSort.getArray(SortOrder.ReverseOrdered, n4), 100) + " n value " + n);
+            final int size = n;
+            System.out.println(benchmark_timer.runFromSupplier(() -> insertionSort.getArray(SortOrder.Random, size), 100) + " n value " + n);
+            System.out.println(benchmark_timer.runFromSupplier(() -> insertionSort.getArray(SortOrder.Ordered, size), 100) + " n value " + n);
+            System.out.println(benchmark_timer.runFromSupplier(() -> insertionSort.getArray(SortOrder.PartiallyOrdered, size), 100) + " n value " + n);
+            System.out.println(benchmark_timer.runFromSupplier(() -> insertionSort.getArray(SortOrder.ReverseOrdered, size), 100) + " n value " + n);
             System.out.println("*".repeat(30));
 
             n *= 2;
