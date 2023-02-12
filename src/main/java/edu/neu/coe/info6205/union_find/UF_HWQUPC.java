@@ -8,6 +8,7 @@
 package edu.neu.coe.info6205.union_find;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Height-weighted Quick Union with Path Compression
@@ -81,8 +82,8 @@ public class UF_HWQUPC implements UF {
     public int find(int p) {
         validate(p);
         int root = p;
-        // FIXME
-        // END 
+        while(parent[root] != root) root = parent[root];
+        if (this.pathCompression) doPathCompression(p);
         return root;
     }
 
@@ -128,6 +129,37 @@ public class UF_HWQUPC implements UF {
     public void setPathCompression(boolean pathCompression) {
         this.pathCompression = pathCompression;
     }
+    public static int count(int n) {
+        Random rand = new Random();
+        UF_HWQUPC unionFind = new UF_HWQUPC(n, true);
+        int m = 0;
+
+        while(unionFind.count - 1 > 0) {
+            int firVal = rand.nextInt(n);
+            int secVal = rand.nextInt(n);
+            m++;
+            if (!unionFind.isConnected(firVal, secVal)) unionFind.union(firVal, secVal);
+        }
+
+        return m;
+    }
+
+    public  static void main(String args[]) {
+
+        // Default value of n is set to 250
+        int n = 250;
+        if (args.length != 0) n = Integer.parseInt(args[0]);
+
+        for (int i = 0; i < 15; i++){
+            int average = 0;
+            for (int j = 0; j < 10; j++) {
+                average += count(n);
+            }
+            average /= 10;
+            System.out.println("The number of connections generated: " + average + " for " + n + " pairs");
+            n *= 2;
+        }
+    }
 
     @Override
     public String toString() {
@@ -169,15 +201,24 @@ public class UF_HWQUPC implements UF {
     private boolean pathCompression;
 
     private void mergeComponents(int i, int j) {
-        // FIXME make shorter root point to taller one
-        // END 
+        if(height[i] >= height[j]) {
+            updateParent(j, i);
+            updateHeight(i, j);
+        }
+        else {
+            updateParent(i, j);
+            updateHeight(j, i);
+        }
     }
 
     /**
      * This implements the single-pass path-halving mechanism of path compression
      */
     private void doPathCompression(int i) {
-        // FIXME update parent to value of grandparent
-        // END 
+        int root = i;
+        while(root != parent[root]) {
+            parent[root] = parent[parent[root]];
+            root = parent[root];
+        }
     }
 }
