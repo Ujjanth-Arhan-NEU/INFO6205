@@ -1,13 +1,11 @@
 package edu.neu.coe.info6205.sort.par;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
 /**
@@ -18,36 +16,38 @@ public class Main {
 
     public static void main(String[] args) {
         processArgs(args);
-        System.out.println("Degree of parallelism: " + ForkJoinPool.getCommonPoolParallelism());
         Random random = new Random();
-        int[] array = new int[2000000];
-        ArrayList<Long> timeList = new ArrayList<>();
-        for (int j = 50; j < 100; j++) {
-            ParSort.cutoff = 10000 * (j + 1);
-            // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-            long time;
-            long startTime = System.currentTimeMillis();
-            for (int t = 0; t < 10; t++) {
-                for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-                ParSort.sort(array, 0, array.length);
+        ArrayList<String> timeList = new ArrayList<>();
+        for (int f = 20; f <= 23; f+=1) {
+            int[] array = new int[(int)Math.pow(2, f)];
+            for (int k = 0; k < 1; k++) {
+                ForkJoinPool executor = new ForkJoinPool((int)Math.pow(2, k));
+                for (int j = 0; j <= 10; j++) {
+                    ParSort.cutoff = array.length/(int) Math.pow(2, j);
+                    // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
+                    long time;
+                    long startTime = System.currentTimeMillis();
+                    for (int t = 0; t < 10; t++) {
+                        for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
+                        ParSort.sort(array, 0, array.length, executor);
+                    }
+                    long endTime = System.currentTimeMillis();
+                    time = (endTime - startTime);
+                    String content = Math.pow(2, f) + "," + executor.getParallelism() + "," + ParSort.cutoff + "," + time/10;
+                    System.out.println(content);
+                    timeList.add(content);
+                }
             }
-            long endTime = System.currentTimeMillis();
-            time = (endTime - startTime);
-            timeList.add(time);
-
-
-            System.out.println("cutoff：" + (ParSort.cutoff) + "\t\t10times Time:" + time + "ms");
-
         }
         try {
             FileOutputStream fis = new FileOutputStream("./src/result.csv");
             OutputStreamWriter isr = new OutputStreamWriter(fis);
             BufferedWriter bw = new BufferedWriter(isr);
             int j = 0;
-            for (long i : timeList) {
-                String content = (double) 10000 * (j + 1) / 2000000 + "," + (double) i / 10 + "\n";
+            for (String i : timeList) {
                 j++;
-                bw.write(content);
+                bw.write(i);
+                bw.newLine();
                 bw.flush();
             }
             bw.close();
@@ -71,10 +71,12 @@ public class Main {
     }
 
     private static void processCommand(String x, String y) {
-        if (x.equalsIgnoreCase("N")) setConfig(x, Integer.parseInt(y));
+        if (x.equalsIgnoreCase("-N")) {
+            setConfig(x, Integer.parseInt(y));
+        }
         else
             // TODO sort this out
-            if (x.equalsIgnoreCase("P")) //noinspection ResultOfMethodCallIgnored
+            if (x.equalsIgnoreCase("-P")) //noinspection ResultOfMethodCallIgnored
                 ForkJoinPool.getCommonPoolParallelism();
     }
 
